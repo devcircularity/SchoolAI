@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from app.models.base import Base
 
 # Database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://school_ai_user:15304223_Strong!@localhost:5432/school_ai_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://schoolai_user:StrongPassword123!@localhost/schoolai_combined")
 
 # Create engine
 engine = create_engine(DATABASE_URL, echo=False)
