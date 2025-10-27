@@ -1,45 +1,31 @@
-# ===== Node Projects =====
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+env/
+venv/
+ENV/
+*.env
+
+# Node / React
 node_modules/
 .next/
 dist/
 build/
-*.log
 
-# ===== Python Projects =====
-venv/
-.env
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.sqlite3
-*.db
-instance/
-.mypy_cache/
-.pytest_cache/
-.ipynb_checkpoints/
-*.egg-info/
-*.egg
-*.so
-*.dylib
-*.pkl
-
-# ===== Rasa Specific =====
-models/
-results/
-*.lock
-events.db
-
-# ===== FastAPI & Uvicorn =====
-*.log
-*.pid
-
-# ===== macOS =====
+# macOS
 .DS_Store
 
-# ===== IDE =====
+# Logs
+*.log
+*.out
+
+# IDE
 .vscode/
 .idea/
 
-# ===== System =====
-Thumbs.db
+# Rasa / cache
+rasa/.rasa/cache/
+models/
