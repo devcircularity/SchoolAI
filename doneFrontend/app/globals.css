@@ -1,0 +1,277 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-brand: #1f7daf;
+  --color-brand-dark: #104f73;
+  --color-brand-light: #3caedb;
+
+  /* Error/Danger colors */
+  --color-error: #dc2626;
+  --color-error-dark: #991b1b;
+  --color-error-light: #f87171;
+
+  /* Warning colors */
+  --color-warning: #d97706;
+  --color-warning-dark: #92400e;
+  --color-warning-light: #fbbf24;
+
+  /* Success colors */
+  --color-success: #059669;
+  --color-success-dark: #047857;
+  --color-success-light: #10b981;
+
+  --radius-xl2: 1rem;
+  --shadow-soft: 0 10px 30px rgba(2, 6, 23, 0.06);
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+html, body, #__next { height: 100%; }
+
+body {
+  @apply bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-feature-settings: "cv02","cv03","cv04","cv11";
+}
+
+/* Reset all links to inherit styling by default */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Startup-ready surfaces */
+.card {
+  @apply rounded-2xl border border-neutral-200/60 bg-white/90 backdrop-blur
+         shadow-[var(--shadow-soft)] dark:bg-neutral-900/60 dark:border-white/10;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-medium
+         text-white transition-colors duration-200
+         disabled:opacity-70 disabled:cursor-not-allowed;
+  background-color: var(--color-brand);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-brand-dark);
+}
+
+.btn-primary:active:not(:disabled) {
+  background-color: var(--color-brand-dark);
+  opacity: 0.9;
+}
+
+/* Error/Danger button */
+.btn-danger {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-medium
+         text-white transition-colors duration-200
+         disabled:opacity-70 disabled:cursor-not-allowed;
+  background-color: var(--color-error);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-error-dark);
+}
+
+.btn-danger:active:not(:disabled) {
+  background-color: var(--color-error-dark);
+  opacity: 0.9;
+}
+
+/* Warning button */
+.btn-warning {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-medium
+         text-white transition-colors duration-200
+         disabled:opacity-70 disabled:cursor-not-allowed;
+  background-color: var(--color-warning);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: var(--color-warning-dark);
+}
+
+.btn-warning:active:not(:disabled) {
+  background-color: var(--color-warning-dark);
+  opacity: 0.9;
+}
+
+/* Success button */
+.btn-success {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-medium
+         text-white transition-colors duration-200
+         disabled:opacity-70 disabled:cursor-not-allowed;
+  background-color: var(--color-success);
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: var(--color-success-dark);
+}
+
+.btn-success:active:not(:disabled) {
+  background-color: var(--color-success-dark);
+  opacity: 0.9;
+}
+
+.input {
+  @apply w-full rounded-xl border border-neutral-200 bg-white px-3 py-2
+         outline-none focus:ring-2 focus:ring-[--color-brand]
+         dark:bg-neutral-900 dark:border-white/10;
+}
+
+/* Subtle gradient header treatment (optional) */
+.header-gradient {
+  background: radial-gradient(1200px 600px at 10% -10%, #3caedb20, transparent),
+              radial-gradient(1200px 600px at 90% -10%, #1f7daf20, transparent);
+}
+
+/* Labels & helper text */
+.label { @apply block text-sm font-medium mb-1; }
+.helper { @apply text-xs text-neutral-500 dark:text-neutral-400; }
+
+/* Invalid states */
+.input-invalid { 
+  @apply border-red-500/70 focus:ring-red-500; 
+  border-color: var(--color-error);
+  --tw-ring-color: var(--color-error);
+}
+.error-text { 
+  @apply text-sm;
+  color: var(--color-error);
+}
+
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition; }
+
+/* Divider */
+.divider { @apply relative my-4 text-center text-xs text-neutral-500; }
+.divider:before, .divider:after {
+  content: ""; @apply absolute top-1/2 w-2/5 border-t border-neutral-200 dark:border-white/10;
+}
+.divider:before { left: 0; }
+.divider:after { right: 0; }
+
+/* Primary brand link styling - apply with .link class */
+.link {
+  @apply underline underline-offset-2 transition-colors duration-200;
+  color: var(--color-brand) !important;
+}
+
+.link:hover {
+  color: var(--color-brand-dark) !important;
+}
+
+.link:active {
+  color: var(--color-brand-dark) !important;
+  opacity: 0.9;
+}
+
+.link:visited {
+  color: var(--color-brand) !important;
+}
+
+/* Subtle link variant - no underline, slightly faded */
+.link-subtle {
+  @apply no-underline transition-colors duration-200;
+  color: var(--color-brand) !important;
+  opacity: 0.8;
+}
+
+.link-subtle:hover {
+  color: var(--color-brand-dark) !important;
+  opacity: 1;
+}
+
+.link-subtle:visited {
+  color: var(--color-brand) !important;
+  opacity: 0.8;
+}
+
+/* Content links - for markdown content, articles, etc. */
+.content-links a {
+  @apply underline underline-offset-2 transition-colors duration-200;
+  color: var(--color-brand) !important;
+}
+
+.content-links a:hover {
+  color: var(--color-brand-dark) !important;
+}
+
+.content-links a:visited {
+  color: var(--color-brand) !important;
+}
+
+/* Chat page polish */
+.chat-surface {
+  /* keeps content narrow like the screenshot */
+  max-width: 60rem; /* 960px */
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* Chat options always visible on active chat */
+.chat-options-active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Overridden button styles to use theme colors */
+.btn-primary {
+  @apply bg-gray-50 hover:bg-gray-100 border border-gray-200 
+         dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600;
+  color: var(--color-brand);
+}
+
+.btn-secondary {
+  @apply bg-gray-50 hover:bg-gray-100 border border-gray-200
+         dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600;
+  color: var(--color-brand);
+}
+
+/* Updated button variants to use theme colors */
+.btn-success {
+  @apply bg-gray-50 hover:bg-gray-100 border border-gray-200
+         dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600;
+  color: var(--color-success);
+}
+
+.btn-warning {
+  @apply bg-gray-50 hover:bg-gray-100 border border-gray-200
+         dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600;
+  color: var(--color-warning);
+}
+
+.btn-danger {
+  @apply bg-gray-50 hover:bg-gray-100 border border-gray-200
+         dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600;
+  color: var(--color-error);
+}
+
+.btn-outline {
+  @apply bg-transparent border-2 hover:bg-gray-50
+         dark:hover:bg-gray-800;
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+/* Button sizes */
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+/* Loading state */
+.btn.loading {
+  @apply opacity-70 cursor-not-allowed;
+}
+
+.btn.loading::after {
+  content: "";
+  @apply w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin ml-2;
+}

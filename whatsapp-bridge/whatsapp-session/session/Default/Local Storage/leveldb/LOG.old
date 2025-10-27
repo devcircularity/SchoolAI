@@ -1,0 +1,33 @@
+2025/08/23-08:36:29.609 b203 Reusing MANIFEST /Users/ericmwirichia/Documents/SchoolAI/core-caht/whatsapp-bridge/whatsapp-session/session/Default/Local Storage/leveldb/MANIFEST-000001
+2025/08/23-08:36:29.610 b203 Recovering log #3
+2025/08/23-08:36:29.610 b203 Reusing old log /Users/ericmwirichia/Documents/SchoolAI/core-caht/whatsapp-bridge/whatsapp-session/session/Default/Local Storage/leveldb/000003.log 
+2025/08/23-12:16:44.946 2d81f Level-0 table #5: started
+2025/08/23-12:16:45.051 2d81f Level-0 table #5: 20731 bytes OK
+2025/08/23-12:16:45.064 2d81f Delete type=0 #3
+2025/08/23-20:41:41.243 a16f Level-0 table #7: started
+2025/08/23-20:41:41.262 a16f Level-0 table #7: 14082 bytes OK
+2025/08/23-20:41:41.273 a16f Delete type=0 #4
+2025/08/24-07:27:30.778 21877 Level-0 table #9: started
+2025/08/24-07:27:30.788 21877 Level-0 table #9: 14118 bytes OK
+2025/08/24-07:27:30.802 21877 Delete type=0 #6
+2025/08/24-16:33:00.725 2913b Level-0 table #11: started
+2025/08/24-16:33:00.735 2913b Level-0 table #11: 14560 bytes OK
+2025/08/24-16:33:00.744 2913b Delete type=0 #8
+2025/08/25-03:49:05.919 231ab Level-0 table #13: started
+2025/08/25-03:49:05.932 231ab Level-0 table #13: 15053 bytes OK
+2025/08/25-03:49:05.944 231ab Delete type=0 #10
+2025/08/25-12:50:18.759 27177 Level-0 table #15: started
+2025/08/25-12:50:18.772 27177 Level-0 table #15: 13993 bytes OK
+2025/08/25-12:50:18.782 27177 Delete type=0 #12
+2025/08/25-12:50:18.783 27177 Compacting 4@0 + 1@1 files
+2025/08/25-12:50:18.791 27177 Generated table #16@0: 8 keys, 3607 bytes
+2025/08/25-12:50:18.791 27177 Compacted 4@0 + 1@1 files => 3607 bytes
+2025/08/25-12:50:18.797 27177 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/08/25-12:50:18.798 27177 Delete type=2 #15
+2025/08/25-12:50:18.798 27177 Delete type=2 #7
+2025/08/25-12:50:18.798 27177 Delete type=2 #13
+2025/08/25-12:50:18.798 27177 Delete type=2 #11
+2025/08/25-12:50:18.798 27177 Delete type=2 #9
+2025/08/25-18:23:36.325 a177 Level-0 table #18: started
+2025/08/25-18:23:36.334 a177 Level-0 table #18: 13978 bytes OK
+2025/08/25-18:23:36.347 a177 Delete type=0 #14

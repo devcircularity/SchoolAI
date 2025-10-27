@@ -1,0 +1,15 @@
+### Create Chat
+POST http://localhost:8010/ai/chats
+Authorization: Bearer {{USER_TOKEN}}
+X-School-ID: {{SCHOOL_ID}}
+Content-Type: application/json
+
+{}
+
+### Notify debtors
+POST http://localhost:8010/ai/chats/{{CHAT_ID}}/messages
+Authorization: Bearer {{USER_TOKEN}}
+X-School-ID: {{SCHOOL_ID}}
+Content-Type: application/json
+
+{ "content": "Send an in-app reminder to all debtors: 'Fees due Friday.'", "message_id": "msg-2001" }

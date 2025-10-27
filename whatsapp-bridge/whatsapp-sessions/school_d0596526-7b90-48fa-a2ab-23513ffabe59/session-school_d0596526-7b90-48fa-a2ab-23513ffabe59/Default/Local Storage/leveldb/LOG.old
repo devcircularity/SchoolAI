@@ -1,0 +1,17 @@
+2025/08/26-15:24:01.438 8503 Creating DB /Users/ericmwirichia/Documents/SchoolAI/core-caht/whatsapp-bridge/whatsapp-sessions/school_d0596526-7b90-48fa-a2ab-23513ffabe59/session-school_d0596526-7b90-48fa-a2ab-23513ffabe59/Default/Local Storage/leveldb since it was missing.
+2025/08/26-15:24:01.482 8503 Reusing MANIFEST /Users/ericmwirichia/Documents/SchoolAI/core-caht/whatsapp-bridge/whatsapp-sessions/school_d0596526-7b90-48fa-a2ab-23513ffabe59/session-school_d0596526-7b90-48fa-a2ab-23513ffabe59/Default/Local Storage/leveldb/MANIFEST-000001
+2025/08/26-17:40:12.359 7a3b Level-0 table #5: started
+2025/08/26-17:40:12.367 7a3b Level-0 table #5: 19878 bytes OK
+2025/08/26-17:40:12.378 7a3b Delete type=0 #3
+2025/08/26-22:58:09.420 f487 Level-0 table #7: started
+2025/08/26-22:58:09.428 f487 Level-0 table #7: 13210 bytes OK
+2025/08/26-22:58:09.461 f487 Delete type=0 #4
+2025/08/27-08:06:16.256 26bd7 Level-0 table #9: started
+2025/08/27-08:06:16.264 26bd7 Level-0 table #9: 12855 bytes OK
+2025/08/27-08:06:16.276 26bd7 Delete type=0 #6
+2025/08/27-16:50:10.676 13c63 Level-0 table #11: started
+2025/08/27-16:50:10.690 13c63 Level-0 table #11: 13520 bytes OK
+2025/08/27-16:50:10.700 13c63 Delete type=0 #8
+2025/08/28-03:48:53.425 f6b7 Level-0 table #13: started
+2025/08/28-03:48:53.433 f6b7 Level-0 table #13: 15228 bytes OK
+2025/08/28-03:48:53.447 f6b7 Delete type=0 #10

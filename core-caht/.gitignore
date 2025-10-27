@@ -1,0 +1,17 @@
+# Node / Puppeteer
+node_modules/
+**/.local-chromium/
+**/chrome-mac/
+**/chrome-linux/
+**/chrome-win/
+.pnpm-store/
+npm-debug.log*
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Env / OS
+.env
+.DS_Store
