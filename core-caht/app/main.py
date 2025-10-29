@@ -58,32 +58,62 @@ def create_app() -> FastAPI:
     # Custom middleware to log requests - AFTER CORS middleware
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
-        # Log CORS-related headers for debugging
-        if request.method == "OPTIONS":
-            logger.info(f"CORS Preflight: {request.method} {request.url.path}")
-            logger.info(f"Origin: {request.headers.get('origin')}")
-            logger.info(f"Access-Control-Request-Method: {request.headers.get('access-control-request-method')}")
-            logger.info(f"Access-Control-Request-Headers: {request.headers.get('access-control-request-headers')}")
+        # Detailed logging for ALL requests to debug CORS
+        print("\n" + "="*80)
+        print(f"📨 INCOMING REQUEST: {request.method} {request.url.path}")
+        print(f"   Full URL: {request.url}")
+        print(f"   Client: {request.client.host if request.client else 'Unknown'}")
+        print("\n📋 REQUEST HEADERS:")
+        for header_name, header_value in request.headers.items():
+            print(f"   {header_name}: {header_value}")
         
-        if request.url.path.startswith("/api/webhooks/"):
-            logger.info(f"Webhook request: {request.method} {request.url.path}")
-        elif request.url.path.startswith("/api/test/"):
-            logger.info(f"Test request: {request.method} {request.url.path}")
-        elif request.url.path.startswith("/api/public/"):
-            logger.info(f"Public request: {request.method} {request.url.path}")
+        # Special attention to CORS preflight
+        if request.method == "OPTIONS":
+            print("\n🔍 CORS PREFLIGHT REQUEST DETECTED!")
+            print(f"   Origin: {request.headers.get('origin', 'NOT PROVIDED')}")
+            print(f"   Requested Method: {request.headers.get('access-control-request-method', 'NOT PROVIDED')}")
+            print(f"   Requested Headers: {request.headers.get('access-control-request-headers', 'NOT PROVIDED')}")
+        
+        # Log specific endpoints
+        if request.url.path.startswith("/api/auth/"):
+            print(f"🔐 AUTH REQUEST: {request.method} {request.url.path}")
+        elif request.url.path.startswith("/api/webhooks/"):
+            print(f"🪝 WEBHOOK REQUEST: {request.method} {request.url.path}")
         elif request.url.path.startswith("/api/admin/"):
-            logger.info(f"Admin request: {request.method} {request.url.path}")
+            print(f"👤 ADMIN REQUEST: {request.method} {request.url.path}")
         
-        response = await call_next(request)
-        
-        # Log CORS response headers for debugging
-        if request.method == "OPTIONS":
-            logger.info(f"CORS Response Headers:")
-            logger.info(f"  Access-Control-Allow-Origin: {response.headers.get('access-control-allow-origin')}")
-            logger.info(f"  Access-Control-Allow-Methods: {response.headers.get('access-control-allow-methods')}")
-            logger.info(f"  Access-Control-Allow-Headers: {response.headers.get('access-control-allow-headers')}")
-        
-        return response
+        try:
+            response = await call_next(request)
+            
+            # Log response details
+            print("\n📤 OUTGOING RESPONSE:")
+            print(f"   Status Code: {response.status_code}")
+            print(f"   RESPONSE HEADERS:")
+            for header_name, header_value in response.headers.items():
+                # Highlight CORS headers
+                if header_name.lower().startswith('access-control'):
+                    print(f"   🌐 {header_name}: {header_value}")
+                else:
+                    print(f"   {header_name}: {header_value}")
+            
+            # Special attention to CORS preflight responses
+            if request.method == "OPTIONS":
+                print("\n✅ CORS PREFLIGHT RESPONSE:")
+                print(f"   Access-Control-Allow-Origin: {response.headers.get('access-control-allow-origin', '❌ NOT SET')}")
+                print(f"   Access-Control-Allow-Methods: {response.headers.get('access-control-allow-methods', '❌ NOT SET')}")
+                print(f"   Access-Control-Allow-Headers: {response.headers.get('access-control-allow-headers', '❌ NOT SET')}")
+                print(f"   Access-Control-Allow-Credentials: {response.headers.get('access-control-allow-credentials', '❌ NOT SET')}")
+                print(f"   Access-Control-Max-Age: {response.headers.get('access-control-max-age', '❌ NOT SET')}")
+            
+            print("="*80 + "\n")
+            return response
+            
+        except Exception as e:
+            print(f"\n❌ ERROR PROCESSING REQUEST: {e}")
+            import traceback
+            traceback.print_exc()
+            print("="*80 + "\n")
+            raise
 
     # Startup event handler
     @app.on_event("startup")
@@ -242,6 +272,28 @@ def create_app() -> FastAPI:
             ]
         }
 
+    @app.get("/cors-test")
+    def cors_test():
+        """Simple endpoint to test CORS configuration"""
+        return {
+            "cors": "working",
+            "message": "If you can see this from your frontend, CORS is configured correctly",
+            "timestamp": "2025-10-29"
+        }
+    
+    @app.post("/cors-test")
+    def cors_test_post():
+        """Test POST with CORS"""
+        return {
+            "cors": "working",
+            "method": "POST",
+            "message": "POST request successful with CORS"
+        }
+
+    @app.options("/cors-test")
+    def cors_test_options():
+        """Explicit OPTIONS handler for testing"""
+        return {"message": "OPTIONS handled"}
 
     @app.get("/whatsapp/health")
     async def whatsapp_health():
