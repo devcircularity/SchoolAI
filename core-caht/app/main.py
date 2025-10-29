@@ -1,7 +1,8 @@
-# app/main.py - Complete version with startup intent configuration initialization and new configuration router
+# app/main.py - Fixed CORS configuration
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 import logging
 
 from app.api.routers import auth as auth_router
@@ -16,9 +17,9 @@ from app.api.routers.admin.intent_config import router as intent_config_router
 from app.api.routers.admin import suggestion_management as suggestion_router
 from app.api.routers.admin import tester_queue as tester_router
 from app.api.routers.admin import user_management as user_management_router
-from app.api.routers.admin import configuration as configuration_router  # New configuration router
+from app.api.routers.admin import configuration as configuration_router
 from app.api.routers.admin import chat_monitoring as chat_monitoring_router
-from app.api.routers.admin import tester_rankings as tester_rankings_router  # ADD THIS LINE
+from app.api.routers.admin import tester_rankings as tester_rankings_router
 from app.api.routers.admin import school_stats as school_stats_router
 
 # Configure logging
@@ -28,20 +29,44 @@ logger = logging.getLogger(__name__)
 def create_app() -> FastAPI:
     app = FastAPI(
         title="School Management AI with SMS/WhatsApp and Document Processing", 
-        version="0.8.2"  # Updated version for new configuration management
+        version="0.8.3"  # Updated version with CORS fix
     )
 
+    # FIXED: Proper CORS configuration for production
+    # Define allowed origins explicitly
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "https://ai1.olaji.co",
+        "https://schoolai.olaji.co",
+        # Add any other frontend domains you use
+    ]
+
+    # Add CORS middleware with proper configuration
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"], 
+        allow_origins=origins,  # Specific origins instead of ["*"]
         allow_credentials=True,
-        allow_methods=["*"], 
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allow_headers=[
+            "Content-Type",
+            "Authorization",
+            "Accept",
+            "Origin",
+            "X-Requested-With",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers",
+        ],
+        expose_headers=["Content-Length", "Content-Type"],
+        max_age=3600,  # Cache preflight requests for 1 hour
     )
 
-    # Custom middleware to log requests
+    # Custom middleware to log requests and add CORS headers explicitly
     @app.middleware("http")
-    async def log_requests(request: Request, call_next):
+    async def log_and_cors_middleware(request: Request, call_next):
+        # Log important requests
         if request.url.path.startswith("/api/webhooks/"):
             logger.info(f"Webhook request: {request.method} {request.url.path}")
             logger.info(f"Headers: {dict(request.headers)}")
@@ -51,8 +76,34 @@ def create_app() -> FastAPI:
             logger.info(f"Public request: {request.method} {request.url.path}")
         elif request.url.path.startswith("/api/admin/"):
             logger.info(f"Admin request: {request.method} {request.url.path}")
+        elif request.url.path.startswith("/api/auth/"):
+            logger.info(f"Auth request: {request.method} {request.url.path}")
+            logger.info(f"Origin: {request.headers.get('origin', 'No origin header')}")
+        
+        # Handle preflight OPTIONS request explicitly
+        if request.method == "OPTIONS":
+            origin = request.headers.get("origin", "")
+            if origin in origins or origins == ["*"]:
+                return Response(
+                    content="",
+                    status_code=200,
+                    headers={
+                        "Access-Control-Allow-Origin": origin,
+                        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+                        "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, Origin, X-Requested-With",
+                        "Access-Control-Allow-Credentials": "true",
+                        "Access-Control-Max-Age": "3600",
+                    }
+                )
         
         response = await call_next(request)
+        
+        # Add CORS headers to all responses as backup
+        origin = request.headers.get("origin", "")
+        if origin in origins or origins == ["*"]:
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+        
         return response
 
     # Startup event handler
@@ -61,15 +112,20 @@ def create_app() -> FastAPI:
         """Initialize services on startup"""
         try:
             print("\n" + "="*60)
-            print("🚀 Starting School AI Backend v0.8.2")
+            print("🚀 Starting School AI Backend v0.8.3")
             print("="*60)
+            
+            # Log CORS configuration
+            print("\n🌐 CORS Configuration:")
+            print(f"   Allowed Origins: {origins}")
+            print(f"   Credentials: Enabled")
             
             # Initialize database connection and intent configuration
             from app.services.config_router import ConfigRouter
             from app.core.db import get_db
             from app.models.intent_config import IntentConfigVersion
             
-            print("📊 Initializing intent configuration...")
+            print("\n📊 Initializing intent configuration...")
             
             try:
                 db = next(get_db())
@@ -167,6 +223,7 @@ def create_app() -> FastAPI:
             print("   Admin interface available at /api/admin/")
             print("   Configuration management at /api/admin/configuration/")
             print("   Health check available at /services/health")
+            print("   CORS enabled for:", ', '.join(origins[:3]) + "...")
             print("="*60 + "\n")
             
         except Exception as e:
@@ -188,16 +245,17 @@ def create_app() -> FastAPI:
     app.include_router(suggestion_router.router, prefix="/api")  
     app.include_router(tester_router.router, prefix="/api")
     app.include_router(user_management_router.router, prefix="/api")
-    app.include_router(configuration_router.router, prefix="/api")  # New configuration management router
+    app.include_router(configuration_router.router, prefix="/api")
     app.include_router(chat_monitoring_router.router, prefix="/api")
-    app.include_router(tester_rankings_router.router, prefix="/api")  # ADD THIS LINE
+    app.include_router(tester_rankings_router.router, prefix="/api")
     app.include_router(school_stats_router.router, prefix="/api")
 
     @app.get("/healthz")
     def health():
         return {
             "ok": True, 
-            "version": "0.8.2", 
+            "version": "0.8.3", 
+            "cors_enabled": True,
             "features": [
                 "chat", 
                 "whatsapp", 
@@ -207,7 +265,7 @@ def create_app() -> FastAPI:
                 "public_chat",
                 "modular_admin_intent_config",
                 "startup_configuration_init",
-                "unified_configuration_management"  # New feature
+                "unified_configuration_management"
             ]
         }
 
@@ -277,7 +335,7 @@ def create_app() -> FastAPI:
                 "timestamp": datetime.utcnow().isoformat(),
                 "overall": "healthy",
                 "services": {},
-                "version": "0.8.2"
+                "version": "0.8.3"
             }
             
             # Test OCR
@@ -335,7 +393,6 @@ def create_app() -> FastAPI:
             # Test Database
             try:
                 db = next(get_db())
-                # Simple query to test DB connection
                 result = db.execute("SELECT 1 as test").fetchone()
                 health["services"]["database"] = {
                     "status": "healthy" if result else "unhealthy"
@@ -347,7 +404,6 @@ def create_app() -> FastAPI:
             # Test Configuration Management endpoints
             try:
                 from app.api.routers.admin.configuration import get_configuration_overview
-                # This is a basic test to ensure the configuration router is working
                 health["services"]["configuration_management"] = {"status": "healthy"}
             except Exception as e:
                 health["services"]["configuration_management"] = {"status": "unhealthy", "error": str(e)}
@@ -375,7 +431,7 @@ def create_app() -> FastAPI:
                 "overall": "unhealthy",
                 "error": str(e),
                 "timestamp": datetime.utcnow().isoformat(),
-                "version": "0.8.2"
+                "version": "0.8.3"
             }
 
     return app
