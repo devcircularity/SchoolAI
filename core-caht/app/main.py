@@ -2,7 +2,6 @@
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
 import logging
 
 from app.api.routers import auth as auth_router
@@ -29,80 +28,60 @@ logger = logging.getLogger(__name__)
 def create_app() -> FastAPI:
     app = FastAPI(
         title="School Management AI with SMS/WhatsApp and Document Processing", 
-        version="0.8.3"  # Updated version with CORS fix
+        version="0.8.3"
     )
 
-    # FIXED: Proper CORS configuration for production
-    # Define allowed origins explicitly
-    origins = [
+    # FIXED CORS Configuration - Must be added BEFORE other middleware
+    allowed_origins = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
         "https://ai1.olaji.co",
-        "https://schoolai.olaji.co",
-        # Add any other frontend domains you use
+        "https://schoolai.olaji.co"
     ]
-
-    # Add CORS middleware with proper configuration
+    
+    print("\n🌐 CORS Configuration:")
+    print(f"   Allowed Origins: {allowed_origins}")
+    print(f"   Credentials: Enabled")
+    
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,  # Specific origins instead of ["*"]
+        allow_origins=allowed_origins,  # Specific origins instead of ["*"]
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-        allow_headers=[
-            "Content-Type",
-            "Authorization",
-            "Accept",
-            "Origin",
-            "X-Requested-With",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers",
-        ],
-        expose_headers=["Content-Length", "Content-Type"],
+        allow_methods=["*"],  # Allow all methods (GET, POST, OPTIONS, etc.)
+        allow_headers=["*"],  # Allow all headers
+        expose_headers=["*"],  # Expose all headers to the browser
         max_age=3600,  # Cache preflight requests for 1 hour
     )
 
-    # Custom middleware to log requests and add CORS headers explicitly
+    # Custom middleware to log requests - AFTER CORS middleware
     @app.middleware("http")
-    async def log_and_cors_middleware(request: Request, call_next):
-        # Log important requests
+    async def log_requests(request: Request, call_next):
+        # Log CORS-related headers for debugging
+        if request.method == "OPTIONS":
+            logger.info(f"CORS Preflight: {request.method} {request.url.path}")
+            logger.info(f"Origin: {request.headers.get('origin')}")
+            logger.info(f"Access-Control-Request-Method: {request.headers.get('access-control-request-method')}")
+            logger.info(f"Access-Control-Request-Headers: {request.headers.get('access-control-request-headers')}")
+        
         if request.url.path.startswith("/api/webhooks/"):
             logger.info(f"Webhook request: {request.method} {request.url.path}")
-            logger.info(f"Headers: {dict(request.headers)}")
         elif request.url.path.startswith("/api/test/"):
             logger.info(f"Test request: {request.method} {request.url.path}")
         elif request.url.path.startswith("/api/public/"):
             logger.info(f"Public request: {request.method} {request.url.path}")
         elif request.url.path.startswith("/api/admin/"):
             logger.info(f"Admin request: {request.method} {request.url.path}")
-        elif request.url.path.startswith("/api/auth/"):
-            logger.info(f"Auth request: {request.method} {request.url.path}")
-            logger.info(f"Origin: {request.headers.get('origin', 'No origin header')}")
-        
-        # Handle preflight OPTIONS request explicitly
-        if request.method == "OPTIONS":
-            origin = request.headers.get("origin", "")
-            if origin in origins or origins == ["*"]:
-                return Response(
-                    content="",
-                    status_code=200,
-                    headers={
-                        "Access-Control-Allow-Origin": origin,
-                        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-                        "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, Origin, X-Requested-With",
-                        "Access-Control-Allow-Credentials": "true",
-                        "Access-Control-Max-Age": "3600",
-                    }
-                )
         
         response = await call_next(request)
         
-        # Add CORS headers to all responses as backup
-        origin = request.headers.get("origin", "")
-        if origin in origins or origins == ["*"]:
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
+        # Log CORS response headers for debugging
+        if request.method == "OPTIONS":
+            logger.info(f"CORS Response Headers:")
+            logger.info(f"  Access-Control-Allow-Origin: {response.headers.get('access-control-allow-origin')}")
+            logger.info(f"  Access-Control-Allow-Methods: {response.headers.get('access-control-allow-methods')}")
+            logger.info(f"  Access-Control-Allow-Headers: {response.headers.get('access-control-allow-headers')}")
         
         return response
 
@@ -114,11 +93,6 @@ def create_app() -> FastAPI:
             print("\n" + "="*60)
             print("🚀 Starting School AI Backend v0.8.3")
             print("="*60)
-            
-            # Log CORS configuration
-            print("\n🌐 CORS Configuration:")
-            print(f"   Allowed Origins: {origins}")
-            print(f"   Credentials: Enabled")
             
             # Initialize database connection and intent configuration
             from app.services.config_router import ConfigRouter
@@ -195,7 +169,7 @@ def create_app() -> FastAPI:
                 else:
                     print("⚠️  OCR service: Unhealthy")
             except:
-                print("❌ OCR service: Unavailable")
+                print("⚠️  OCR service: Unhealthy")
             
             # Test Ollama service
             try:
@@ -223,7 +197,7 @@ def create_app() -> FastAPI:
             print("   Admin interface available at /api/admin/")
             print("   Configuration management at /api/admin/configuration/")
             print("   Health check available at /services/health")
-            print("   CORS enabled for:", ', '.join(origins[:3]) + "...")
+            print(f"   CORS enabled for: {', '.join(allowed_origins[:3])}...")
             print("="*60 + "\n")
             
         except Exception as e:
@@ -242,7 +216,7 @@ def create_app() -> FastAPI:
     app.include_router(test_router.router, prefix="/api")
     app.include_router(public_router.router)
     app.include_router(intent_config_router, prefix="/api")
-    app.include_router(suggestion_router.router, prefix="/api")  
+    app.include_router(suggestion_router.router, prefix="/api")
     app.include_router(tester_router.router, prefix="/api")
     app.include_router(user_management_router.router, prefix="/api")
     app.include_router(configuration_router.router, prefix="/api")
@@ -255,7 +229,6 @@ def create_app() -> FastAPI:
         return {
             "ok": True, 
             "version": "0.8.3", 
-            "cors_enabled": True,
             "features": [
                 "chat", 
                 "whatsapp", 
@@ -268,6 +241,7 @@ def create_app() -> FastAPI:
                 "unified_configuration_management"
             ]
         }
+
 
     @app.get("/whatsapp/health")
     async def whatsapp_health():
@@ -335,7 +309,7 @@ def create_app() -> FastAPI:
                 "timestamp": datetime.utcnow().isoformat(),
                 "overall": "healthy",
                 "services": {},
-                "version": "0.8.3"
+                "version": "0.8.2"
             }
             
             # Test OCR
@@ -393,6 +367,7 @@ def create_app() -> FastAPI:
             # Test Database
             try:
                 db = next(get_db())
+                # Simple query to test DB connection
                 result = db.execute("SELECT 1 as test").fetchone()
                 health["services"]["database"] = {
                     "status": "healthy" if result else "unhealthy"
@@ -404,6 +379,7 @@ def create_app() -> FastAPI:
             # Test Configuration Management endpoints
             try:
                 from app.api.routers.admin.configuration import get_configuration_overview
+                # This is a basic test to ensure the configuration router is working
                 health["services"]["configuration_management"] = {"status": "healthy"}
             except Exception as e:
                 health["services"]["configuration_management"] = {"status": "unhealthy", "error": str(e)}
@@ -431,7 +407,7 @@ def create_app() -> FastAPI:
                 "overall": "unhealthy",
                 "error": str(e),
                 "timestamp": datetime.utcnow().isoformat(),
-                "version": "0.8.3"
+                "version": "0.8.2"
             }
 
     return app
